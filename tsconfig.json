@@ -1,0 +1,82 @@
+{
+  "compilerOptions": {
+    /* ── Language & Environment ─────────────────────────────────────────── */
+    "target": "ES2022",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "ES2022"
+    ],
+    "jsx": "react-jsx",
+    /* ── Module Resolution ──────────────────────────────────────────────── */
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+    "resolveJsonModule": true,
+    "allowJs": false,
+    /* ── Strict Mode (NON-NEGOTIABLE per project rules) ─────────────────── */
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "noImplicitThis": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    /* ── Unused Code ────────────────────────────────────────────────────── */
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    /* ── Emit ───────────────────────────────────────────────────────────── */
+    "noEmit": true,
+    "incremental": true,
+    /* ── Interop ────────────────────────────────────────────────────────── */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    /* ── Plugins ────────────────────────────────────────────────────────── */
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    /* ── Path Aliases ───────────────────────────────────────────────────── */
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@/components/*": [
+        "./src/components/*"
+      ],
+      "@/store/*": [
+        "./src/store/*"
+      ],
+      "@/lib/*": [
+        "./src/lib/*"
+      ],
+      "@/types/*": [
+        "./src/types/*"
+      ],
+      "@/hooks/*": [
+        "./src/hooks/*"
+      ],
+      "@/providers/*": [
+        "./src/providers/*"
+      ]
+    },
+    "skipLibCheck": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "server"
+  ]
+}
