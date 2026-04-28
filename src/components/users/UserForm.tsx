@@ -45,6 +45,21 @@ export function UserForm({ editUser }: UserFormProps) {
         if (!isOpen) reset();
     }, [isOpen, reset]);
 
+    // Reset form when editUser data arrives asynchronously
+    useEffect(() => {
+        if (editUser) {
+            reset({
+                firstName: editUser.firstName,
+                lastName: editUser.lastName,
+                email: editUser.email,
+                role: editUser.role,
+                status: editUser.status,
+                phone: editUser.phone ?? undefined,
+                password: "placeholder",
+            });
+        }
+    }, [editUser, reset]);
+
     const onClose = () => {
         dispatch(setUserFormOpen(false));
         dispatch(setSelectedUser(null));

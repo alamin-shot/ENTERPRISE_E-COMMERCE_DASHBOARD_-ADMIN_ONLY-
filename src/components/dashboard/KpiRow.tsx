@@ -44,6 +44,8 @@ export function KpiRow() {
                 icon={<DollarSign size={18} />}
                 iconColor="bg-amber-400/10 text-amber-400"
                 isLoading={isLoading}
+                accent="amber"
+                index={0}
             />
             <StatsCard
                 title="Total Orders"
@@ -53,6 +55,8 @@ export function KpiRow() {
                 icon={<ShoppingCart size={18} />}
                 iconColor="bg-info-500/10 text-info-400"
                 isLoading={isLoading}
+                accent="info"
+                index={1}
             />
             <StatsCard
                 title="Total Products"
@@ -62,6 +66,8 @@ export function KpiRow() {
                 icon={<Package size={18} />}
                 iconColor="bg-purple-500/10 text-purple-400"
                 isLoading={isLoading}
+                accent="purple"
+                index={2}
             />
             <StatsCard
                 title="Total Users"
@@ -71,6 +77,8 @@ export function KpiRow() {
                 icon={<Users size={18} />}
                 iconColor="bg-success-500/10 text-success-400"
                 isLoading={isLoading}
+                accent="success"
+                index={3}
             />
         </div>
     );

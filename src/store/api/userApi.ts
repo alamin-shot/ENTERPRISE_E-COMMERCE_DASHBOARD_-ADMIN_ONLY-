@@ -58,10 +58,21 @@ export const userApi = createApi({
     }),
 
     getUserStats: builder.query<ApiResponse<UserStats>, void>({
-      queryFn: async () => {
+      queryFn: async (_arg, { getState }) => {
         if (!isMockMode()) { const res = await fetch(`${API_BASE}${USER_API.STATS}`); return { data: (await res.json()) as ApiResponse<UserStats> }; }
         warnMock(); await mockDelay();
-        return { data: { success: true, message: "OK", timestamp: new Date().toISOString(), data: mockUserStats } };
+        const items = (getState() as any).user.items as User[];
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        const stats: UserStats = {
+          totalUsers: items.length,
+          activeUsers: items.filter((u) => u.status === "active").length,
+          newUsersToday: items.filter((u) => u.createdAt >= todayStart).length,
+          newUsersThisMonth: items.filter((u) => u.createdAt >= monthStart).length,
+          suspendedUsers: items.filter((u) => u.status === "suspended").length,
+        };
+        return { data: { success: true, message: "OK", timestamp: new Date().toISOString(), data: stats } };
       },
       providesTags: ["User"],
     }),

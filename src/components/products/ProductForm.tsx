@@ -54,6 +54,25 @@ export function ProductForm({ editProduct }: ProductFormProps) {
         if (!isOpen) { reset(); setImageUrl(null); }
     }, [isOpen, reset]);
 
+    // Reset form when editProduct data arrives asynchronously
+    useEffect(() => {
+        if (editProduct) {
+            reset({
+                name: editProduct.name,
+                description: editProduct.description,
+                price: editProduct.price,
+                comparePrice: editProduct.comparePrice ?? undefined,
+                sku: editProduct.sku,
+                stock: editProduct.stock,
+                category: editProduct.category,
+                status: editProduct.status,
+                tags: editProduct.tags,
+                weight: editProduct.weight ?? undefined,
+            });
+            setImageUrl(editProduct.images[0]?.url ?? null);
+        }
+    }, [editProduct, reset]);
+
     const onClose = () => {
         dispatch(setProductFormOpen(false));
         dispatch(setSelectedProduct(null));

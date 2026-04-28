@@ -66,10 +66,18 @@ export const productApi = createApi({
     }),
 
     getProductStats: builder.query<ApiResponse<ProductStats>, void>({
-      queryFn: async () => {
+      queryFn: async (_arg, { getState }) => {
         if (!isMockMode()) { const res = await fetch(`${API_BASE}${PRODUCT_API.STATS}`); return { data: (await res.json()) as ApiResponse<ProductStats> }; }
         warnMock(); await mockDelay();
-        return { data: { success: true, message: "OK", timestamp: new Date().toISOString(), data: mockProductStats } };
+        const items = (getState() as any).product.items as Product[];
+        const stats: ProductStats = {
+          totalProducts: items.length,
+          activeProducts: items.filter((p) => p.status === "active").length,
+          outOfStock: items.filter((p) => p.stock === 0).length,
+          lowStock: items.filter((p) => p.stock > 0 && p.stock < 10).length,
+          totalValue: items.reduce((sum, p) => sum + p.price * p.stock, 0),
+        };
+        return { data: { success: true, message: "OK", timestamp: new Date().toISOString(), data: stats } };
       },
       providesTags: ["Product"],
     }),

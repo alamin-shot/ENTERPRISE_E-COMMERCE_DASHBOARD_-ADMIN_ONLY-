@@ -39,11 +39,18 @@ const orderSlice = createSlice({
     ) => {
       const index = state.items.findIndex((o) => o.id === action.payload.id);
       if (index !== -1) {
-      const order = state.items[index];
-      if (order) {
-        order.status = action.payload.status;
-        order.updatedAt = new Date().toISOString();
-      }
+        const order = state.items[index];
+        if (order) {
+          order.status = action.payload.status;
+          order.updatedAt = new Date().toISOString();
+
+          // Auto-update payment status based on order status for static mode
+          if (["delivered", "shipped", "processing", "confirmed"].includes(action.payload.status)) {
+            order.paymentStatus = "paid";
+          } else if (action.payload.status === "refunded") {
+            order.paymentStatus = "refunded";
+          }
+        }
       }
     },
   },

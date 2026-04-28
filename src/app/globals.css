@@ -843,3 +843,423 @@ body {
   background: var(--line);
   margin: 0.125rem 0;
 }
+
+/* ─── KPI StatsCard Premium Animations ─────────────────────────────────────── */
+
+/* Rotating conic gradient border */
+@keyframes kpi-border-rotate {
+  0% {
+    --kpi-angle: 0deg;
+  }
+
+  100% {
+    --kpi-angle: 360deg;
+  }
+}
+
+/* Staggered slide-up entrance */
+@keyframes kpi-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(32px) scale(0.96);
+    filter: blur(4px);
+  }
+
+  60% {
+    opacity: 1;
+    filter: blur(0px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0px);
+  }
+}
+
+/* Shimmer sweep across card */
+@keyframes kpi-shimmer-sweep {
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+  }
+
+  100% {
+    transform: translateX(200%) skewX(-15deg);
+  }
+}
+
+/* Floating icon bob */
+@keyframes kpi-icon-float {
+
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+
+  25% {
+    transform: translateY(-3px) rotate(2deg);
+  }
+
+  75% {
+    transform: translateY(2px) rotate(-1deg);
+  }
+}
+
+/* Sparkle particle */
+@keyframes kpi-sparkle {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0) rotate(360deg);
+  }
+}
+
+/* Subtle pulse for the glow ring */
+@keyframes kpi-glow-pulse {
+
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+/* Value pop-in */
+@keyframes kpi-value-pop {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+
+  60% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Trend badge slide */
+@keyframes kpi-trend-slide {
+  0% {
+    transform: translateX(-12px);
+    opacity: 0;
+  }
+
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Background gradient mesh movement */
+@keyframes kpi-mesh-drift {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Orbiting dot around icon */
+@keyframes kpi-orbit {
+  0% {
+    transform: rotate(0deg) translateX(20px) rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg) translateX(20px) rotate(-360deg);
+  }
+}
+
+.kpi-card {
+  --kpi-accent: #F5A623;
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  padding: 1.5rem 1.25rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: kpi-enter 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  cursor: default;
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from var(--kpi-angle, 0deg),
+      transparent 0%,
+      var(--kpi-accent) 10%,
+      transparent 20%,
+      transparent 80%,
+      var(--kpi-accent) 90%,
+      transparent 100%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+@supports (background: conic-gradient(from 0deg, red, blue)) {
+  .kpi-card::before {
+    animation: kpi-border-rotate 4s linear infinite;
+  }
+}
+
+.kpi-card::before {
+  opacity: 1;
+}
+
+.kpi-card {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 0 0 1px var(--border-default),
+    0 0 40px color-mix(in srgb, var(--kpi-accent) 15%, transparent);
+}
+
+/* Shimmer sweep overlay */
+.kpi-card-shimmer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.kpi-card-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg,
+      transparent,
+      color-mix(in srgb, var(--kpi-accent) 6%, transparent),
+      transparent);
+  animation: kpi-shimmer-sweep 4s ease-in-out infinite;
+  animation-delay: inherit;
+}
+
+/* Background mesh gradient */
+.kpi-card-mesh {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 60% at 80% 0%,
+      color-mix(in srgb, var(--kpi-accent) 6%, transparent),
+      transparent);
+  pointer-events: none;
+  border-radius: inherit;
+  transition: opacity 0.4s ease;
+}
+
+.kpi-card .kpi-card-mesh {
+  opacity: 1.5;
+  background: radial-gradient(ellipse 80% 60% at 80% 0%,
+      color-mix(in srgb, var(--kpi-accent) 12%, transparent),
+      transparent);
+}
+
+/* Sparkle particles */
+.kpi-sparkles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.kpi-card .kpi-sparkles {
+  opacity: 1;
+}
+
+.kpi-sparkle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--kpi-accent);
+  animation: kpi-sparkle 2s ease-in-out infinite;
+}
+
+.kpi-sparkle:nth-child(1) {
+  top: 15%;
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.kpi-sparkle:nth-child(2) {
+  top: 60%;
+  left: 75%;
+  animation-delay: 0.5s;
+  width: 3px;
+  height: 3px;
+}
+
+.kpi-sparkle:nth-child(3) {
+  top: 30%;
+  left: 85%;
+  animation-delay: 1s;
+  width: 2px;
+  height: 2px;
+}
+
+.kpi-sparkle:nth-child(4) {
+  top: 80%;
+  left: 40%;
+  animation-delay: 1.5s;
+  width: 3px;
+  height: 3px;
+}
+
+.kpi-sparkle:nth-child(5) {
+  top: 10%;
+  left: 60%;
+  animation-delay: 0.8s;
+  width: 2px;
+  height: 2px;
+}
+
+/* Icon container with float */
+.kpi-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  flex-shrink: 0;
+  transition: all 0.4s ease;
+}
+
+.kpi-card .kpi-icon-wrap {
+  animation: kpi-icon-float 3s ease-in-out infinite;
+  transform: scale(1.1);
+}
+
+/* Orbiting dot */
+.kpi-orbit-dot {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--kpi-accent);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  animation: kpi-orbit 3s linear infinite;
+}
+
+.kpi-card .kpi-orbit-dot {
+  opacity: 0.6;
+}
+
+/* Glow ring behind icon */
+.kpi-glow-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--kpi-accent) 20%, transparent);
+  filter: blur(8px);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.kpi-card:hover .kpi-glow-ring {
+  opacity: 1;
+  animation: kpi-glow-pulse 2s ease-in-out infinite;
+}
+
+/* Value with pop animation */
+.kpi-value {
+  animation: kpi-value-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: 0.3s;
+}
+
+/* Trend badge */
+.kpi-trend {
+  animation: kpi-trend-slide 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.6s;
+}
+
+/* Bottom accent bar */
+.kpi-accent-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: linear-gradient(90deg, transparent, var(--kpi-accent), transparent);
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.kpi-card:hover .kpi-accent-bar {
+  width: 100%;
+}
+
+/* Stagger delays via data attribute */
+.kpi-card[data-index="0"] {
+  animation-delay: 0s;
+}
+
+.kpi-card[data-index="0"] .kpi-card-shimmer::after {
+  animation-delay: 0s;
+}
+
+.kpi-card[data-index="1"] {
+  animation-delay: 0.1s;
+}
+
+.kpi-card[data-index="1"] .kpi-card-shimmer::after {
+  animation-delay: 1s;
+}
+
+.kpi-card[data-index="2"] {
+  animation-delay: 0.2s;
+}
+
+.kpi-card[data-index="2"] .kpi-card-shimmer::after {
+  animation-delay: 2s;
+}
+
+.kpi-card[data-index="3"] {
+  animation-delay: 0.3s;
+}
+
+.kpi-card[data-index="3"] .kpi-card-shimmer::after {
+  animation-delay: 3s;
+}
+
+@property --kpi-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
