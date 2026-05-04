@@ -1,4 +1,3 @@
-// ─── lib/mock/orders.mock.ts ────────────────────────────────────────────────────
 
 import type { Order } from "@/types/order.types";
 import type { RevenueDataPoint } from "@/types/order.types";

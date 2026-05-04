@@ -7,7 +7,7 @@ const initialState: UserState = {
   selectedUserId: null,
   filters: {
     page: 1,
-    limit: 10,
+    limit: 8,
     sortBy: "createdAt",
     sortOrder: "desc",
   },

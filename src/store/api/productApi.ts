@@ -7,7 +7,6 @@ import type { ApiResponse, PaginatedResponse } from "@/types/api.types";
 import { PRODUCT_API, API_BASE } from "@/lib/constants/api";
 import { getAccessToken } from "@/lib/utils/cookies";
 import { isMockMode, mockDelay, warnMock, mockPaginated } from "./helpers";
-
 import { addProduct, updateProduct, deleteProduct } from "../slices/productSlice";
 // Removed circular RootState import
 

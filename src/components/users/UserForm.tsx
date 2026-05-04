@@ -73,7 +73,7 @@ export function UserForm({ editUser }: UserFormProps) {
                 await createUser(values).unwrap();
             }
             onClose();
-        } catch { /* handled by toast */ }
+        } catch { }
     };
 
     return (
