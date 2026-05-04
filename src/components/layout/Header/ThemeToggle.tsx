@@ -21,6 +21,7 @@ export function ThemeToggle() {
                     onClick={() => setTheme(opt.value)}
                     aria-label={`${opt.label} mode`}
                     title={opt.label}
+                    suppressHydrationWarning
                     className={cn(
                         "flex h-7 w-7 items-center justify-center rounded-md",
                         "transition-all duration-150",

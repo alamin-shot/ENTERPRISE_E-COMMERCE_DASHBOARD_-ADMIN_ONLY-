@@ -6,7 +6,7 @@ import type { User, UserFilters, UserStats, CreateUserPayload, UpdateUserPayload
 import type { ApiResponse, PaginatedResponse } from "@/types/api.types";
 import { USER_API, API_BASE } from "@/lib/constants/api";
 import { getAccessToken } from "@/lib/utils/cookies";
-import { isMockMode, mockDelay, warnMock, mockPaginated } from "./helpers";
+import { isMockMode, mockDelay, warnMock, mockPaginated, apiFetch } from "./helpers";
 import { addUser, updateUser, deleteUser } from "../slices/userSlice";
 // Removed circular RootState import
 
@@ -32,8 +32,10 @@ export const userApi = createApi({
         if (!isMockMode()) {
           const params = new URLSearchParams();
           Object.entries(filters).forEach(([k, v]) => { if (v !== undefined) params.set(k, String(v)); });
-          const res = await fetch(`${API_BASE}${USER_API.LIST}?${params}`);
-          return { data: (await res.json()) as PaginatedResponse<User> };
+          const res = await apiFetch(`${API_BASE}${USER_API.LIST}?${params}`);
+          const json = await res.json();
+          if (!res.ok) return { error: { status: res.status, data: json } } as any;
+          return { data: json as PaginatedResponse<User> };
         }
         warnMock(); await mockDelay();
         const items = (getState() as any).user.items as User[];
@@ -47,7 +49,12 @@ export const userApi = createApi({
 
     getUserById: builder.query<ApiResponse<User>, string>({
       queryFn: async (id, { getState }) => {
-        if (!isMockMode()) { const res = await fetch(`${API_BASE}${USER_API.DETAIL(id)}`); return { data: (await res.json()) as ApiResponse<User> }; }
+        if (!isMockMode()) { 
+          const res = await apiFetch(`${API_BASE}${USER_API.DETAIL(id)}`); 
+          const json = await res.json();
+          if (!res.ok) return { error: { status: res.status, data: json } } as any;
+          return { data: json as ApiResponse<User> }; 
+        }
         warnMock(); await mockDelay();
         const items = (getState() as any).user.items as User[];
         const u = items.find((x) => x.id === id);
@@ -58,7 +65,12 @@ export const userApi = createApi({
 
     getUserStats: builder.query<ApiResponse<UserStats>, void>({
       queryFn: async (_arg, { getState }) => {
-        if (!isMockMode()) { const res = await fetch(`${API_BASE}${USER_API.STATS}`); return { data: (await res.json()) as ApiResponse<UserStats> }; }
+        if (!isMockMode()) { 
+          const res = await apiFetch(`${API_BASE}${USER_API.STATS}`); 
+          const json = await res.json();
+          if (!res.ok) return { error: { status: res.status, data: json } } as any;
+          return { data: json as ApiResponse<UserStats> }; 
+        }
         warnMock(); await mockDelay();
         const items = (getState() as any).user.items as User[];
         const now = new Date();
@@ -78,19 +90,29 @@ export const userApi = createApi({
 
     createUser: builder.mutation<ApiResponse<User>, CreateUserPayload>({
       queryFn: async (payload, { dispatch }) => {
-        if (!isMockMode()) { const res = await fetch(`${API_BASE}${USER_API.CREATE}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }); return { data: (await res.json()) as ApiResponse<User> }; }
+        if (!isMockMode()) { 
+          const res = await apiFetch(`${API_BASE}${USER_API.CREATE}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }); 
+          const json = await res.json();
+          if (!res.ok) return { error: { status: res.status, data: json } } as any;
+          return { data: json as ApiResponse<User> }; 
+        }
         warnMock(); await mockDelay();
         const u: User = { ...payload, id: `user-${Date.now()}`, avatar: null, isEmailVerified: false, phone: payload.phone ?? null, address: null, lastLoginAt: null, totalOrders: 0, totalSpent: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
         dispatch(addUser(u));
         return { data: { success: true, message: "Created", timestamp: new Date().toISOString(), data: u } };
       },
       invalidatesTags: ["User"],
-      async onQueryStarted(_, { queryFulfilled }) { const id = toast.loading("Creating..."); try { await queryFulfilled; toast.success("User created!", { id }); } catch { toast.error("Failed", { id }); } },
+      async onQueryStarted(_, { queryFulfilled }) { const id = toast.loading("Creating..."); try { await queryFulfilled; toast.success("User created!", { id }); } catch (err: any) { toast.error(err.error?.data?.message || "Failed to create user", { id }); } },
     }),
 
     updateUser: builder.mutation<ApiResponse<User>, { id: string; payload: UpdateUserPayload }>({
       queryFn: async ({ id, payload }, { dispatch, getState }) => {
-        if (!isMockMode()) { const res = await fetch(`${API_BASE}${USER_API.UPDATE(id)}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }); return { data: (await res.json()) as ApiResponse<User> }; }
+        if (!isMockMode()) { 
+          const res = await apiFetch(`${API_BASE}${USER_API.UPDATE(id)}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }); 
+          const json = await res.json();
+          if (!res.ok) return { error: { status: res.status, data: json } } as any;
+          return { data: json as ApiResponse<User> }; 
+        }
         warnMock(); await mockDelay();
         const items = (getState() as any).user.items as User[];
         const existing = items.find((u) => u.id === id) ?? items[0];
@@ -100,18 +122,23 @@ export const userApi = createApi({
         return { data: { success: true, message: "Updated", timestamp: new Date().toISOString(), data: updated } };
       },
       invalidatesTags: ["User"],
-      async onQueryStarted(_, { queryFulfilled }) { const id = toast.loading("Updating..."); try { await queryFulfilled; toast.success("Updated!", { id }); } catch { toast.error("Failed", { id }); } },
+      async onQueryStarted(_, { queryFulfilled }) { const id = toast.loading("Updating..."); try { await queryFulfilled; toast.success("Updated!", { id }); } catch (err: any) { toast.error(err.error?.data?.message || "Failed to update user", { id }); } },
     }),
 
     deleteUser: builder.mutation<ApiResponse<null>, string>({
       queryFn: async (id, { dispatch }) => {
-        if (!isMockMode()) { const res = await fetch(`${API_BASE}${USER_API.DELETE(id)}`, { method: "DELETE" }); return { data: (await res.json()) as ApiResponse<null> }; }
+        if (!isMockMode()) { 
+          const res = await apiFetch(`${API_BASE}${USER_API.DELETE(id)}`, { method: "DELETE" }); 
+          const json = await res.json();
+          if (!res.ok) return { error: { status: res.status, data: json } } as any;
+          return { data: json as ApiResponse<null> }; 
+        }
         warnMock(); await mockDelay();
         dispatch(deleteUser(id));
         return { data: { success: true, message: "Deleted", timestamp: new Date().toISOString(), data: null } };
       },
       invalidatesTags: ["User"],
-      async onQueryStarted(_, { queryFulfilled }) { const id = toast.loading("Deleting..."); try { await queryFulfilled; toast.success("Deleted!", { id }); } catch { toast.error("Failed", { id }); } },
+      async onQueryStarted(_, { queryFulfilled }) { const id = toast.loading("Deleting..."); try { await queryFulfilled; toast.success("Deleted!", { id }); } catch (err: any) { toast.error(err.error?.data?.message || "Failed to delete user", { id }); } },
     }),
   }),
 });

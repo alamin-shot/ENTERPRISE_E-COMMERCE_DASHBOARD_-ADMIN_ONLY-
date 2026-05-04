@@ -6,7 +6,7 @@ import type { Order, OrderFilters, OrderStats, UpdateOrderStatusPayload, Revenue
 import type { ApiResponse, PaginatedResponse } from "@/types/api.types";
 import { ORDER_API, API_BASE } from "@/lib/constants/api";
 import { getAccessToken } from "@/lib/utils/cookies";
-import { isMockMode, mockDelay, warnMock, mockPaginated } from "./helpers";
+import { isMockMode, mockDelay, warnMock, mockPaginated, apiFetch } from "./helpers";
 import { mockOrderStats, mockRevenue } from "@/lib/mock";
 import { updateOrderStatus } from "../slices/orderSlice";
 // Removed circular RootState import
@@ -40,8 +40,10 @@ export const orderApi = createApi({
         if (!isMockMode()) {
           const params = new URLSearchParams();
           Object.entries(filters).forEach(([k, v]) => { if (v !== undefined) params.set(k, String(v)); });
-          const res = await fetch(`${API_BASE}${ORDER_API.LIST}?${params}`);
-          return { data: (await res.json()) as PaginatedResponse<Order> };
+          const res = await apiFetch(`${API_BASE}${ORDER_API.LIST}?${params}`);
+          const json = await res.json();
+          if (!res.ok) return { error: { status: res.status, data: json } } as any;
+          return { data: json as PaginatedResponse<Order> };
         }
         warnMock(); await mockDelay();
         const items = (getState() as any).order.items as Order[];
@@ -55,7 +57,12 @@ export const orderApi = createApi({
 
     getOrderById: builder.query<ApiResponse<Order>, string>({
       queryFn: async (id, { getState }) => {
-        if (!isMockMode()) { const res = await fetch(`${API_BASE}${ORDER_API.DETAIL(id)}`); return { data: (await res.json()) as ApiResponse<Order> }; }
+        if (!isMockMode()) { 
+          const res = await apiFetch(`${API_BASE}${ORDER_API.DETAIL(id)}`); 
+          const json = await res.json();
+          if (!res.ok) return { error: { status: res.status, data: json } } as any;
+          return { data: json as ApiResponse<Order> }; 
+        }
         warnMock(); await mockDelay();
         const items = (getState() as any).order.items as Order[];
         const o = items.find((x) => x.id === id);
@@ -66,7 +73,12 @@ export const orderApi = createApi({
 
     getOrderStats: builder.query<ApiResponse<OrderStats>, void>({
       queryFn: async () => {
-        if (!isMockMode()) { const res = await fetch(`${API_BASE}${ORDER_API.STATS}`); return { data: (await res.json()) as ApiResponse<OrderStats> }; }
+        if (!isMockMode()) { 
+          const res = await apiFetch(`${API_BASE}${ORDER_API.STATS}`); 
+          const json = await res.json();
+          if (!res.ok) return { error: { status: res.status, data: json } } as any;
+          return { data: json as ApiResponse<OrderStats> }; 
+        }
         warnMock(); await mockDelay();
         return { data: { success: true, message: "OK", timestamp: new Date().toISOString(), data: mockOrderStats } };
       },
@@ -75,7 +87,12 @@ export const orderApi = createApi({
 
     getRevenueData: builder.query<ApiResponse<RevenueDataPoint[]>, void>({
       queryFn: async () => {
-        if (!isMockMode()) { const res = await fetch(`${API_BASE}${ORDER_API.REVENUE}`); return { data: (await res.json()) as ApiResponse<RevenueDataPoint[]> }; }
+        if (!isMockMode()) { 
+          const res = await apiFetch(`${API_BASE}${ORDER_API.REVENUE}`); 
+          const json = await res.json();
+          if (!res.ok) return { error: { status: res.status, data: json } } as any;
+          return { data: json as ApiResponse<RevenueDataPoint[]> }; 
+        }
         warnMock(); await mockDelay();
         return { data: { success: true, message: "OK", timestamp: new Date().toISOString(), data: mockRevenue } };
       },
@@ -83,7 +100,12 @@ export const orderApi = createApi({
 
     updateOrderStatus: builder.mutation<ApiResponse<Order>, UpdateOrderStatusPayload>({
       queryFn: async ({ orderId, status }, { dispatch, getState }) => {
-        if (!isMockMode()) { const res = await fetch(`${API_BASE}${ORDER_API.UPDATE_STATUS(orderId)}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) }); return { data: (await res.json()) as ApiResponse<Order> }; }
+        if (!isMockMode()) { 
+          const res = await apiFetch(`${API_BASE}${ORDER_API.UPDATE_STATUS(orderId)}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status }) }); 
+          const json = await res.json();
+          if (!res.ok) return { error: { status: res.status, data: json } } as any;
+          return { data: json as ApiResponse<Order> }; 
+        }
         warnMock(); await mockDelay();
         dispatch(updateOrderStatus({ id: orderId, status }));
         const items = (getState() as any).order.items as Order[];

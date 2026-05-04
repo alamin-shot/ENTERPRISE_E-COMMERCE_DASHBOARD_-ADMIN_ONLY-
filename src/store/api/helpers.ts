@@ -1,6 +1,7 @@
 // ─── store/api/helpers.ts ───────────────────────────────────────────────────────
 
 import { isMockMode } from "@/lib/api-mode";
+import { getAccessToken } from "@/lib/utils/cookies";
 
 export { isMockMode };
 
@@ -28,4 +29,13 @@ export function mockPaginated<T>(items: T[], page: number, limit: number) {
         hasPrev: page > 1,
         data: paged,
     };
+}
+
+export async function apiFetch(url: string, options: RequestInit = {}) {
+    const token = getAccessToken();
+    const headers = new Headers(options.headers || {});
+    if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+    }
+    return fetch(url, { ...options, headers });
 }

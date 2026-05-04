@@ -6,7 +6,7 @@ import {
   DEFAULT_UNAUTH_REDIRECT,
 } from "@/lib/constants/routes";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const accessToken = request.cookies.get("access_token")?.value;
   const isPublicRoute = PUBLIC_ROUTES.some((route) =>

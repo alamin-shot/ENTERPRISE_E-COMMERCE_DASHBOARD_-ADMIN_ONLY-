@@ -30,23 +30,32 @@ export async function sendOtpEmail({
 }: OtpEmailOptions): Promise<void> {
   const subject = SUBJECT_MAP[purpose];
 
-  await transporter.sendMail({
-    from: env.smtpFrom,
-    to,
-    subject,
-    html: `
-      <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
-        <h2 style="color:#1F2833">Enterprise Dashboard</h2>
-        <p style="color:#4a5a72">Your one-time code is:</p>
-        <div style="background:#0f1117;border-radius:12px;padding:24px;text-align:center;margin:24px 0">
-          <span style="font-size:36px;font-weight:bold;letter-spacing:8px;color:#F5A623;font-family:monospace">
-            ${otp}
-          </span>
+  try {
+    await transporter.sendMail({
+      from: env.smtpFrom,
+      to,
+      subject,
+      html: `
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:32px">
+          <h2 style="color:#1F2833">Enterprise Dashboard</h2>
+          <p style="color:#4a5a72">Your one-time code is:</p>
+          <div style="background:#0f1117;border-radius:12px;padding:24px;text-align:center;margin:24px 0">
+            <span style="font-size:36px;font-weight:bold;letter-spacing:8px;color:#F5A623;font-family:monospace">
+              ${otp}
+            </span>
+          </div>
+          <p style="color:#6b7a93;font-size:13px">
+            This code expires in <strong>10 minutes</strong>. Do not share it with anyone.
+          </p>
         </div>
-        <p style="color:#6b7a93;font-size:13px">
-          This code expires in <strong>10 minutes</strong>. Do not share it with anyone.
-        </p>
-      </div>
-    `,
-  });
+      `,
+    });
+  } catch (error) {
+    console.error("[Email Error] Failed to send email. Check SMTP configuration in .env:", error);
+    if (env.nodeEnv === "development") {
+      console.log(`\n[DEV MODE] Captured OTP for ${to}: ${otp}\n`);
+    } else {
+      throw error;
+    }
+  }
 }

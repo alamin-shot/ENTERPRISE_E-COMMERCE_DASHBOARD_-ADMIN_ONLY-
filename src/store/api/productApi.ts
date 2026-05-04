@@ -6,7 +6,7 @@ import type { Product, ProductFilters, ProductStats, ProductFormPayload } from "
 import type { ApiResponse, PaginatedResponse } from "@/types/api.types";
 import { PRODUCT_API, API_BASE } from "@/lib/constants/api";
 import { getAccessToken } from "@/lib/utils/cookies";
-import { isMockMode, mockDelay, warnMock, mockPaginated } from "./helpers";
+import { isMockMode, mockDelay, warnMock, mockPaginated, apiFetch } from "./helpers";
 import { addProduct, updateProduct, deleteProduct } from "../slices/productSlice";
 // Removed circular RootState import
 
@@ -40,8 +40,10 @@ export const productApi = createApi({
         if (!isMockMode()) {
           const params = new URLSearchParams();
           Object.entries(filters).forEach(([k, v]) => { if (v !== undefined) params.set(k, String(v)); });
-          const res = await fetch(`${API_BASE}${PRODUCT_API.LIST}?${params}`);
-          return { data: (await res.json()) as PaginatedResponse<Product> };
+          const res = await apiFetch(`${API_BASE}${PRODUCT_API.LIST}?${params}`);
+          const json = await res.json();
+          if (!res.ok) return { error: { status: res.status, data: json } } as any;
+          return { data: json as PaginatedResponse<Product> };
         }
         warnMock(); await mockDelay();
         const items = (getState() as any).product.items as Product[];
@@ -55,7 +57,12 @@ export const productApi = createApi({
 
     getProductById: builder.query<ApiResponse<Product>, string>({
       queryFn: async (id, { getState }) => {
-        if (!isMockMode()) { const res = await fetch(`${API_BASE}${PRODUCT_API.DETAIL(id)}`); return { data: (await res.json()) as ApiResponse<Product> }; }
+        if (!isMockMode()) { 
+          const res = await apiFetch(`${API_BASE}${PRODUCT_API.DETAIL(id)}`); 
+          const json = await res.json();
+          if (!res.ok) return { error: { status: res.status, data: json } } as any;
+          return { data: json as ApiResponse<Product> }; 
+        }
         warnMock(); await mockDelay();
         const items = (getState() as any).product.items as Product[];
         const p = items.find((x) => x.id === id);
@@ -66,7 +73,12 @@ export const productApi = createApi({
 
     getProductStats: builder.query<ApiResponse<ProductStats>, void>({
       queryFn: async (_arg, { getState }) => {
-        if (!isMockMode()) { const res = await fetch(`${API_BASE}${PRODUCT_API.STATS}`); return { data: (await res.json()) as ApiResponse<ProductStats> }; }
+        if (!isMockMode()) { 
+          const res = await apiFetch(`${API_BASE}${PRODUCT_API.STATS}`); 
+          const json = await res.json();
+          if (!res.ok) return { error: { status: res.status, data: json } } as any;
+          return { data: json as ApiResponse<ProductStats> }; 
+        }
         warnMock(); await mockDelay();
         const items = (getState() as any).product.items as Product[];
         const stats: ProductStats = {
@@ -83,7 +95,12 @@ export const productApi = createApi({
 
     createProduct: builder.mutation<ApiResponse<Product>, ProductFormPayload>({
       queryFn: async (payload, { dispatch }) => {
-        if (!isMockMode()) { const res = await fetch(`${API_BASE}${PRODUCT_API.CREATE}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }); return { data: (await res.json()) as ApiResponse<Product> }; }
+        if (!isMockMode()) { 
+          const res = await apiFetch(`${API_BASE}${PRODUCT_API.CREATE}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }); 
+          const json = await res.json();
+          if (!res.ok) return { error: { status: res.status, data: json } } as any;
+          return { data: json as ApiResponse<Product> }; 
+        }
         warnMock(); await mockDelay();
         const p: Product = { ...payload, id: `prod-${Date.now()}`, comparePrice: payload.comparePrice ?? null, images: [], dimensions: null, weight: payload.weight ?? null, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
         dispatch(addProduct(p));
@@ -95,7 +112,12 @@ export const productApi = createApi({
 
     updateProduct: builder.mutation<ApiResponse<Product>, { id: string; payload: Partial<ProductFormPayload> }>({
       queryFn: async ({ id, payload }, { getState, dispatch }) => {
-        if (!isMockMode()) { const res = await fetch(`${API_BASE}${PRODUCT_API.UPDATE(id)}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }); return { data: (await res.json()) as ApiResponse<Product> }; }
+        if (!isMockMode()) { 
+          const res = await apiFetch(`${API_BASE}${PRODUCT_API.UPDATE(id)}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }); 
+          const json = await res.json();
+          if (!res.ok) return { error: { status: res.status, data: json } } as any;
+          return { data: json as ApiResponse<Product> }; 
+        }
         warnMock(); await mockDelay();
         const items = (getState() as any).product.items as Product[];
         const existing = items.find((p) => p.id === id) ?? items[0];
@@ -110,7 +132,12 @@ export const productApi = createApi({
 
     deleteProduct: builder.mutation<ApiResponse<null>, string>({
       queryFn: async (id, { dispatch }) => {
-        if (!isMockMode()) { const res = await fetch(`${API_BASE}${PRODUCT_API.DELETE(id)}`, { method: "DELETE" }); return { data: (await res.json()) as ApiResponse<null> }; }
+        if (!isMockMode()) { 
+          const res = await apiFetch(`${API_BASE}${PRODUCT_API.DELETE(id)}`, { method: "DELETE" }); 
+          const json = await res.json();
+          if (!res.ok) return { error: { status: res.status, data: json } } as any;
+          return { data: json as ApiResponse<null> }; 
+        }
         warnMock(); await mockDelay();
         dispatch(deleteProduct(id));
         return { data: { success: true, message: "Deleted", timestamp: new Date().toISOString(), data: null } };

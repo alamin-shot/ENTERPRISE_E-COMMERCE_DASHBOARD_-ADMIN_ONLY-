@@ -47,7 +47,7 @@ export function SidebarNav() {
     const { data: orderStats } = useGetOrderStatsQuery();
 
     const navItemsWithBadge: NavItem[] = NAV_ITEMS.map((item) => {
-        if (item.href === DASHBOARD_ROUTES.ORDERS && orderStats?.data.pendingOrders) {
+        if (item.href === DASHBOARD_ROUTES.ORDERS && orderStats?.data?.pendingOrders) {
             return { ...item, badge: orderStats.data.pendingOrders };
         }
         return item;

@@ -48,7 +48,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 export function RevenueChart() {
     const { data, isLoading } = useGetRevenueDataQuery();
 
-    const chartData = data?.data.map((d: RevenueDataPoint) => ({
+    const chartData = (data?.data ?? []).map((d: RevenueDataPoint) => ({
         ...d,
         date: d.date.slice(5), // show MM-DD only
     })) ?? [];
