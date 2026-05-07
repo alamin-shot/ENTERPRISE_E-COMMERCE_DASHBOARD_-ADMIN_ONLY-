@@ -25,8 +25,10 @@ export function UserForm({ editUser }: UserFormProps) {
     const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
     const isLoading = isCreating || isUpdating;
 
+    const formSchema = editUser ? createUserSchema.omit({ password: true }) : createUserSchema;
+
     const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<CreateUserFormValues>({
-        resolver: zodResolver(createUserSchema),
+        resolver: zodResolver(formSchema as any),
         defaultValues: editUser ? {
             firstName: editUser.firstName,
             lastName: editUser.lastName,
@@ -34,7 +36,6 @@ export function UserForm({ editUser }: UserFormProps) {
             role: editUser.role,
             status: editUser.status,
             phone: editUser.phone ?? undefined,
-            password: "placeholder",
         } : { role: "viewer", status: "active" },
     });
 
@@ -55,7 +56,6 @@ export function UserForm({ editUser }: UserFormProps) {
                 role: editUser.role,
                 status: editUser.status,
                 phone: editUser.phone ?? undefined,
-                password: "placeholder",
             });
         }
     }, [editUser, reset]);
@@ -65,15 +65,18 @@ export function UserForm({ editUser }: UserFormProps) {
         dispatch(setSelectedUser(null));
     };
 
-    const onSubmit = async (values: CreateUserFormValues) => {
+    const onSubmit = async (values: any) => {
         try {
             if (editUser) {
-                await updateUser({ id: editUser.id, payload: values }).unwrap();
+                const { password, ...updatePayload } = values;
+                await updateUser({ id: editUser.id, payload: updatePayload }).unwrap();
             } else {
                 await createUser(values).unwrap();
             }
             onClose();
-        } catch { }
+        } catch (error) { 
+            console.error("Form submission failed:", error);
+        }
     };
 
     return (
