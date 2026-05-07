@@ -8,6 +8,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "seed": "tsx src/scripts/seed.ts",
+    "fix-admin": "tsx src/scripts/fix-admin.ts",
     "lint": "eslint src --ext .ts"
   },
   "dependencies": {

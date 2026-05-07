@@ -80,10 +80,14 @@ export function ProductForm({ editProduct }: ProductFormProps) {
 
     const onSubmit = async (values: ProductFormValues) => {
         try {
+            const payload = {
+                ...values,
+                images: imageUrl ? [{ id: `img-${Date.now()}`, url: imageUrl, alt: values.name, isPrimary: true }] : [],
+            };
             if (editProduct) {
-                await updateProduct({ id: editProduct.id, payload: values }).unwrap();
+                await updateProduct({ id: editProduct.id, payload }).unwrap();
             } else {
-                await createProduct(values).unwrap();
+                await createProduct(payload).unwrap();
             }
             onClose();
         } catch { /* toast handled by RTK Query */ }

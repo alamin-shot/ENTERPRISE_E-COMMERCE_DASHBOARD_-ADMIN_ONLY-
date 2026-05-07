@@ -65,6 +65,7 @@ export interface ProductFormPayload {
   status: ProductStatus;
   tags: string[];
   weight?: number | null | undefined;
+  images?: { id: string; url: string; alt?: string; isPrimary?: boolean }[];
 }
 
 // ─── Filters ──────────────────────────────────────────────────────────────────

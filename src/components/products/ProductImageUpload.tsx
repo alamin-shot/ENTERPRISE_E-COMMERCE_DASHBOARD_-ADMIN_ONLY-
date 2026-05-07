@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Upload, X, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
@@ -11,13 +11,35 @@ interface ProductImageUploadProps {
 
 export function ProductImageUpload({ value, onChange }: ProductImageUploadProps) {
     const [isDragging, setIsDragging] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const processFile = (file: File) => {
+        if (!file.type.startsWith("image/")) return;
+        if (file.size > 5 * 1024 * 1024) return; // 5MB limit
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            if (e.target?.result) {
+                onChange?.(e.target.result as string);
+            }
+        };
+        reader.readAsDataURL(file);
+    };
 
     const handleDrop = (e: React.DragEvent) => {
         e.preventDefault();
         setIsDragging(false);
-        // In production: upload to Cloudinary/S3 and call onChange(url)
-        // For mock: use a placeholder
-        onChange?.("https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400");
+        const file = e.dataTransfer.files?.[0];
+        if (file) {
+            processFile(file);
+        }
+    };
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            processFile(file);
+        }
     };
 
     return (
@@ -39,11 +61,19 @@ export function ProductImageUpload({ value, onChange }: ProductImageUploadProps)
                     </button>
                 </div>
             ) : (
-                <div
-                    onDrop={handleDrop}
-                    onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-                    onDragLeave={() => setIsDragging(false)}
-                    onClick={() => onChange?.("https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400")}
+                <>
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        accept="image/png, image/jpeg, image/jpg"
+                        onChange={handleFileSelect}
+                    />
+                    <div
+                        onDrop={handleDrop}
+                        onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                        onDragLeave={() => setIsDragging(false)}
+                        onClick={() => fileInputRef.current?.click()}
                     className={cn(
                         "flex flex-col items-center justify-center gap-2",
                         "w-full h-40 rounded-xl border-2 border-dashed cursor-pointer",
@@ -61,6 +91,7 @@ export function ProductImageUpload({ value, onChange }: ProductImageUploadProps)
                     </p>
                     <p className="text-[10px] text-[var(--text-tertiary)] opacity-60">PNG, JPG up to 5MB</p>
                 </div>
+                </>
             )}
         </div>
     );
