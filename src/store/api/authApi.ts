@@ -77,6 +77,7 @@ export const authApi = createApi({
             body: JSON.stringify(payload),
           });
           const data = (await res.json()) as ApiResponse<LoginResponse>;
+          if (!res.ok) return { error: { status: res.status, data } };
           return { data };
         } catch (error) {
           return { error: { status: "CUSTOM_ERROR", error: String(error) } };
@@ -87,8 +88,9 @@ export const authApi = createApi({
         try {
           await queryFulfilled;
           toast.success("Welcome back!", { id: toastId });
-        } catch {
-          toast.error("Invalid credentials", { id: toastId });
+        } catch (err: any) {
+          const msg = err?.error?.data?.message ?? "Invalid credentials";
+          toast.error(msg, { id: toastId });
         }
       },
     }),
@@ -112,6 +114,7 @@ export const authApi = createApi({
             body: JSON.stringify(payload),
           });
           const data = (await res.json()) as ApiResponse<RegisterResponse>;
+          if (!res.ok) return { error: { status: res.status, data } };
           return { data };
         } catch (error) {
           return { error: { status: "CUSTOM_ERROR", error: String(error) } };
@@ -124,8 +127,9 @@ export const authApi = createApi({
           toast.success("Account created! Check your email for OTP.", {
             id: toastId,
           });
-        } catch {
-          toast.error("Registration failed", { id: toastId });
+        } catch (err: any) {
+          const msg = err?.error?.data?.message ?? "Registration failed";
+          toast.error(msg, { id: toastId });
         }
       },
     }),
@@ -140,6 +144,7 @@ export const authApi = createApi({
             body: JSON.stringify(payload),
           });
           const data = (await res.json()) as ApiResponse<OtpResponse>;
+          if (!res.ok) return { error: { status: res.status, data } };
           return { data };
         } catch (error) {
           return { error: { status: "CUSTOM_ERROR", error: String(error) } };
@@ -150,8 +155,9 @@ export const authApi = createApi({
         try {
           await queryFulfilled;
           toast.success("OTP verified!", { id: toastId });
-        } catch {
-          toast.error("Invalid OTP", { id: toastId });
+        } catch (err: any) {
+          const msg = err?.error?.data?.message ?? "Invalid OTP";
+          toast.error(msg, { id: toastId });
         }
       },
     }),
@@ -178,6 +184,7 @@ export const authApi = createApi({
             body: JSON.stringify(payload),
           });
           const data = (await res.json()) as ApiResponse<{ message: string }>;
+          if (!res.ok) return { error: { status: res.status, data } };
           return { data };
         } catch (error) {
           return { error: { status: "CUSTOM_ERROR", error: String(error) } };
@@ -188,8 +195,9 @@ export const authApi = createApi({
         try {
           await queryFulfilled;
           toast.success("OTP sent to your email!", { id: toastId });
-        } catch {
-          toast.error("Email not found", { id: toastId });
+        } catch (err: any) {
+          const msg = err?.error?.data?.message ?? "Email not found";
+          toast.error(msg, { id: toastId });
         }
       },
     }),
@@ -217,6 +225,7 @@ export const authApi = createApi({
             body: JSON.stringify(payload),
           });
           const data = (await res.json()) as ApiResponse<{ message: string }>;
+          if (!res.ok) return { error: { status: res.status, data } };
           return { data };
         } catch (error) {
           return { error: { status: "CUSTOM_ERROR", error: String(error) } };
@@ -227,8 +236,9 @@ export const authApi = createApi({
         try {
           await queryFulfilled;
           toast.success("Password reset successfully!", { id: toastId });
-        } catch {
-          toast.error("Failed to reset password", { id: toastId });
+        } catch (err: any) {
+          const msg = err?.error?.data?.message ?? "Failed to reset password";
+          toast.error(msg, { id: toastId });
         }
       },
     }),
